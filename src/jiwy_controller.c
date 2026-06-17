@@ -5,11 +5,13 @@
 #include "panmodel.h"
 #include "tiltmodel.h"
 #include "stdlib.h"
+#include <fcntl.h>
+#include <unistd.h>
 
-uint32_t setPWM(int enable, int dir, int duty)
-{
-    return (enable << 9) | (dir << 8) | (duty & 0xFF);
-}
+// uint32_t setPWM(int enable, int dir, int duty)
+// {
+//     return (enable << 9) | (dir << 8) | (duty & 0xFF);
+// }
 
 uint32_t waitForEncoderEndStop(uint32_t *numberPtr)
 {
@@ -57,7 +59,7 @@ void Jiwy_Init(Jiwy *jiwy,
     // for (int i = 0; i < 2; i++)
     //     jiwy->tiltOutput[i] = 0.0;
 
-    TiltodelInitialize();
+    TiltModelInitialize();
     PanModelInitialize();
 }
 

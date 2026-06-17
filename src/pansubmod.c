@@ -17,7 +17,6 @@
 
 /* 20-sim include files */
 #include "panmodel.h"
-#include "xxinteg.h"
 #include "xxfuncs.h"
 #include "panmodel.h"
 #include "motionprofiles.h"
@@ -26,6 +25,48 @@
 /* The submodel I/O variables */
 XXInteger Pan_number_of_inputs = 2;
 XXInteger Pan_number_of_outputs = 2;
+
+extern XXDouble Pan_time;
+extern XXDouble Pan_step_size;
+
+#define Pan_STATE_SIZE 3
+
+/*********************************************************************
+ * Discrete integration method
+ *********************************************************************/
+
+/* the initialization of the Discrete integration method */
+void PanDiscreteInitialize (void)
+{
+	/* nothing to be done */
+	Pan_major = XXTRUE;
+}
+
+/* the termination of the Discrete integration method */
+void PanDiscreteTerminate (void)
+{
+	/* nothing to be done */
+}
+
+/* the Discrete integration method itself */
+void PanDiscreteStep (void)
+{
+	XXInteger index;
+
+	/* for each of the supplied states */
+	for (index = 0; index < Pan_STATE_SIZE; index++)
+	{
+		/* just a move of the new state */
+		Pan_s [index] = Pan_R [index];
+	}
+	/* increment the simulation time */
+	Pan_time += Pan_step_size;
+
+	Pan_major = XXTRUE;
+
+	/* evaluate the dynamic part to calculate the new rates */
+	PanCalculateDynamic ();
+}
 
 /* the names of the submodel io variables
    uncomment this part if you need these names

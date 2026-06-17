@@ -36,7 +36,7 @@ extern XXString tilt_output_names[];
 /* The submodel functions */
 void TiltInitializeSubmodel (XXDouble *u, XXDouble *y, XXDouble t);
 void TiltCalculateSubmodel (XXDouble *u, XXDouble *y, XXDouble t);
-void TiltCerminateSubmodel (XXDouble *u, XXDouble *y, XXDouble t);
+void TiltTerminateSubmodel (XXDouble *u, XXDouble *y, XXDouble t);
 void TiltCopyInputsToVariables (XXDouble *u);
 void TiltCopyVariablesToOutputs (XXDouble *y);
 

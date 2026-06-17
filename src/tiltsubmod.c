@@ -17,7 +17,6 @@
 
 /* 20-sim include files */
 #include "tiltmodel.h"
-#include "xxinteg.h"
 #include "xxfuncs.h"
 #include "tiltmodel.h"
 #include "motionprofiles.h"
@@ -26,6 +25,48 @@
 /* The submodel I/O variables */
 XXInteger tilt_number_of_inputs = 3;
 XXInteger tilt_number_of_outputs = 1;
+
+extern XXDouble tilt_time;
+extern XXDouble tilt_step_size;
+
+#define tilt_STATE_SIZE 3
+
+/*********************************************************************
+ * Discrete integration method
+ *********************************************************************/
+
+/* the initialization of the Discrete integration method */
+void TiltDiscreteInitialize (void)
+{
+	/* nothing to be done */
+	tilt_major = XXTRUE;
+}
+
+/* the termination of the Discrete integration method */
+void TiltDiscreteTerminate (void)
+{
+	/* nothing to be done */
+}
+
+/* the Discrete integration method itself */
+void TiltDiscreteStep (void)
+{
+	XXInteger index;
+
+	/* for each of the supplied states */
+	for (index = 0; index < tilt_STATE_SIZE; index++)
+	{
+		/* just a move of the new state */
+		tilt_s [index] = tilt_R [index];
+	}
+	/* increment the simulation time */
+	tilt_time += tilt_step_size;
+
+	tilt_major = XXTRUE;
+
+	/* evaluate the dynamic part to calculate the new rates */
+	TiltCalculateDynamic ();
+}
 
 /* the names of the submodel io variables
    uncomment this part if you need these names
@@ -59,13 +100,13 @@ void TiltCopyVariablesToOutputs (XXDouble *y)
 }
 
 /* The initialization function for submodel */
-void XXInitializeSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
+void TiltInitializeSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
 {
 	/* Initialization phase (allocating memory) */
 	tilt_initialize = XXTRUE;
 	tilt_steps = 0;
-	XXModelInitialize ();
-	XXDiscreteInitialize ();
+	TiltModelInitialize ();
+	TiltDiscreteInitialize ();
 
 	/* Copy the inputs */
 	tilt_time = t;
@@ -94,7 +135,7 @@ void TiltCalculateSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
 
 	/* Calculate the model */
 	TiltCalculateInput ();
-	XXDiscreteStep ();
+	TiltDiscreteStep ();
 	TiltCalculateOutput ();
 
 	/* Copy the outputs */
@@ -102,7 +143,7 @@ void TiltCalculateSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
 }
 
 /* The termination function for submodel */
-void XXTerminateSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
+void TiltTerminateSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
 {
 	/* Copy the inputs */
 	tilt_time = t;
@@ -115,7 +156,7 @@ void XXTerminateSubmodel (XXDouble *u, XXDouble *y, XXDouble t)
 	TiltCopyVariablesToOutputs (y);
 
 	/* and terminate the model itself (releasing memory) */
-	XXModelTerminate ();
-	XXDiscreteTerminate ();
+	TiltModelTerminate ();
+	TiltDiscreteTerminate ();
 }
 

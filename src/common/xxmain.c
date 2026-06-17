@@ -22,36 +22,36 @@
  */
 
 /* 20-sim include files */
-#include "xxsubmod.h"
+// #include "xxsubmod.h"
 
 /* The main function */
-int main()
-{
-	XXDouble u [3 + 1];
-	XXDouble y [1 + 1];
+// int main()
+// {
+// 	XXDouble u [3 + 1];
+// 	XXDouble y [1 + 1];
 
-	/* Initialize the inputs and outputs with correct initial values */
-	u[0] = 0.0;		/* corr */
-	u[1] = 0.0;		/* in */
-	u[2] = 0.0;		/* position */
+// 	/* Initialize the inputs and outputs with correct initial values */
+// 	u[0] = 0.0;		/* corr */
+// 	u[1] = 0.0;		/* in */
+// 	u[2] = 0.0;		/* position */
 
-	y[0] = 0.0;		/* out */
+// 	y[0] = 0.0;		/* out */
 
 
-	/* Initialize the submodel itself */
-	XXInitializeSubmodel (u, y, xx_time);
+// 	/* Initialize the submodel itself */
+// 	XXInitializeSubmodel (u, y, xx_time);
 
-	/* Simple loop, the time is incremented by the integration method */
-	while ( (xx_time < xx_finish_time) && (xx_stop_simulation == XXFALSE) )
-	{
-		/* Call the submodel to calculate the output */
-		XXCalculateSubmodel (u, y, xx_time);
-	}
+// 	/* Simple loop, the time is incremented by the integration method */
+// 	while ( (xx_time < xx_finish_time) && (xx_stop_simulation == XXFALSE) )
+// 	{
+// 		/* Call the submodel to calculate the output */
+// 		XXCalculateSubmodel (u, y, xx_time);
+// 	}
 
-	/* Perform the final calculations */
-	XXTerminateSubmodel (u, y, xx_time);
+// 	/* Perform the final calculations */
+// 	XXTerminateSubmodel (u, y, xx_time);
 
-	/* and we are done */
-	return 0;
-}
+// 	/* and we are done */
+// 	return 0;
+// }
 

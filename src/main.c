@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <sys/mman.h>
 #include <unistd.h>
-//#include "jiwy_controller.h"
+#include "jiwy_controller.h"
 
 #include "soc_system.h"
 

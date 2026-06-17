@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 		perror("Couldn't open /dev/mem\n");
 		return -1;
 	}
-	uint8_t  *base      = NULL;
+	uint32_t *base      = NULL;
 	uint32_t *pitch_enc = NULL;
 	uint32_t *yaw_enc   = NULL;
 	if (base == MAP_FAILED)
@@ -34,10 +34,10 @@ int main(int argc, char **argv)
 	// Avalon maps a contiguous memory area
 	// Pan = Yaw
 	// Pitch = Tilt
-    uint8_t *encoderTilt = (uint8_t *)mmap(NULL, HPS_0_ARM_A9_0_ENCODER_BUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_ENCODER_BUS_0_BASE);
-    uint8_t *encoderPan  = (uint8_t *)mmap(NULL, HPS_0_ARM_A9_0_ENCODER_BUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_ENCODER_BUS_1_BASE);
-    uint8_t *pwmTilt     = (uint8_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_0_BASE);
-    uint8_t *pwmPan      = (uint8_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_1_BASE);
+    uint32_t *encoderTilt = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_ENCODER_BUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_ENCODER_BUS_0_BASE);
+    uint32_t *encoderPan  = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_ENCODER_BUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_ENCODER_BUS_1_BASE);
+    uint32_t *pwmTilt     = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_0_BASE);
+    uint32_t *pwmPan      = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_1_BASE);
 
 	//Jiwy jiwy;
 	//Jiwy_Init(&jiwy, encoderPan, encoderTilt, pwmPan, pwmTilt);

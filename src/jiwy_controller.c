@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "math.h"
-#include "panmodel.h"
-#include "tiltmodel.h"
+#include "pansubmod.h"
+#include "tiltsubmod.h"
 #include "stdlib.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -45,20 +45,6 @@ void Jiwy_Init(Jiwy *jiwy,
     jiwy->tiltMin = 0;
     jiwy->tiltMax = 0;
 
-    // tilt_V[9]  = input for the tilt model
-    // tilt_V[10] = position of the tilt jiwy (from encoder)
-    // tilt_V[11] = output -> range from -0.99 to 0.99
-
-    // initialize arrays to all 0
-    // for (int i = 0; i < 3; i++)
-    //     jiwy->panInput[i] = 0.0;
-    // for (int i = 0; i < 3; i++)
-    //     jiwy->panOutput[i] = 0.0;
-    // for (int i = 0; i < 4; i++)
-    //     jiwy->tiltInput[i] = 0.0;
-    // for (int i = 0; i < 2; i++)
-    //     jiwy->tiltOutput[i] = 0.0;
-
     TiltModelInitialize();
     PanModelInitialize();
 }
@@ -66,24 +52,24 @@ void Jiwy_Init(Jiwy *jiwy,
 void SetTiltPWM(Jiwy *jiwy)
 {
     int dir = 0;
-    if (tilt_V[11] <= 0)
+    if (jiwy->tilt_velocity <= 0)
     {
         dir = 1;
     }
     int enable = 1;
-    uint8_t duty = (uint8_t)(abs(tilt_V[11] * 128));
+    uint32_t duty = (uint32_t)(abs(jiwy->tilt_velocity * 128));
     *jiwy->pwmTiltPtr = setPWM(enable, dir, duty);
 }
 
 void SetPanPWM(Jiwy *jiwy)
 {
     int dir = 0;
-    if (Pan_V[11] <= 0)
+    if (jiwy->pan_velocity <= 0)
     {
         dir = 1;
     }
     int enable = 1;
-    uint8_t duty = (uint8_t)(abs(Pan_V[11] * 128));
+    uint32_t duty = (uint32_t)(abs(jiwy->pan_velocity * 128));
     *jiwy->pwmPanPtr = setPWM(enable, dir, duty);
 }
 
@@ -129,11 +115,13 @@ void Update(Jiwy *jiwy)
     SetTiltPWM(jiwy);
     SetPanPWM(jiwy);
 
-    // measure
-    tilt_V[10] = getTilt(jiwy);
-    Pan_V[10]  = getPan(jiwy);
+    // measure and set current positions
+    jiwy->tilt_current = getTilt(jiwy);
+    jiwy->pan_current = getPan(jiwy);
+
+    double tilt_inputs[3]  = {0.0, jiwy->tilt_target, jiwy->tilt_current};
+    double tilt_outputs[3] = {0.0, 0.0, 0.0};
 
     // calculate
-    TiltCalculateDynamic();
-    PanCalculateDynamic();
+    TiltCalculateSubmodel(&tilt_inputs, &tilt_outputs, 0.0);
 }

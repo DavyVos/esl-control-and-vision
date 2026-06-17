@@ -16,6 +16,7 @@ typedef struct
   int32_t tiltMin, tiltMax;
 
   // converted pitch and pan positions to feed into submodels
+  
   double tilt_target, tilt_current;
   double pan_target, pan_current;
 
@@ -33,22 +34,22 @@ void Jiwy_Init(Jiwy *jiwy,
                uint32_t *pwmPan,
                uint32_t *pwmTilt);
 
-void CalibratePan(Jiwy *jiwy);
-void CalibrateTilt(Jiwy *jiwy);
+void Jiwy_CalibratePan(Jiwy *jiwy);
+void Jiwy_CalibrateTilt(Jiwy *jiwy);
 
-void SetTargetPan(Jiwy *jiwy, double target);
-void SetTargetTilt(Jiwy *jiwy, double target);
+void Jiwy_SetTargetPan(Jiwy *jiwy, double target);
+void Jiwy_SetTargetTilt(Jiwy *jiwy, double target);
 
 // Set the PWM output according to current Jiwy
-void SetPanPWM(Jiwy *jiwy);
-void SetTiltPWM(Jiwy *jiwy);
+void Jiwy_SetPanPWM(Jiwy *jiwy);
+void Jiwy_SetTiltPWM(Jiwy *jiwy);
 
-void Disable(Jiwy *jiwy);
-void Update(Jiwy *jiwy);
+void Jiwy_Disable(Jiwy *jiwy);
+void Jiwy_Update(Jiwy *jiwy);
 
-double getPan(Jiwy *jiwy);
-double getTilt(Jiwy *jiwy);
+double Jiwy_getPan(Jiwy *jiwy);
+double Jiwy_getTilt(Jiwy *jiwy);
 
-uint32_t setPWM(int enable, int dir, int duty);
+uint32_t Jiwy_setPWM(int enable, int dir, int duty);
 
 #endif

@@ -7,11 +7,6 @@
 
 #include "soc_system.h"
 
-uint32_t setPWM(int enable, int dir, int duty)
-{
-    return (enable << 9) | (dir << 8) | (duty & 0xFF);
-}
-
 int main(int argc, char **argv)
 {
 	int fd = 0; // file descriptor
@@ -39,14 +34,14 @@ int main(int argc, char **argv)
     uint32_t *pwmTilt     = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_0_BASE);
     uint32_t *pwmPan      = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_1_BASE);
 
-	//Jiwy jiwy;
-	//Jiwy_Init(&jiwy, encoderPan, encoderTilt, pwmPan, pwmTilt);
+	Jiwy jiwy;
+	Jiwy_Init(&jiwy, encoderPan, encoderTilt, pwmPan, pwmTilt);
 
-	// CalibrateTilt(&jiwy);
-	// CalibratePan(&jiwy);
+	Jiwy_CalibrateTilt(&jiwy);
+	Jiwy_CalibratePan(&jiwy);
 
-	// SetTargetPan(&jiwy, 0.5);
-	// SetTargetTilt(&jiwy, 0.5);
+	//SetTargetPan(&jiwy, 0.5);
+	//SetTargetTilt(&jiwy, 0.5);
 
 	uint8_t enable = 0;
 	uint8_t dir = 0;
@@ -59,9 +54,7 @@ int main(int argc, char **argv)
 		uint32_t panValue     = *((uint32_t *)encoderPan);
 		uint32_t tiltValue    = *((uint32_t *)encoderTilt);
 		printf("PWM(Tilt: %u, pan: %u), Encoder(Tilt: %u, Pan: %u)\n", pwmTiltValue, pwmPanValue, tiltValue, panValue);
-
-		*pwmPan = setPWM(enable, dir, duty);
-		*pwmTilt = setPWM(!enable, !dir, 128 - duty);
+		//Update();
 		usleep(100);
 	}
 

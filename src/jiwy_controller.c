@@ -8,10 +8,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// uint32_t setPWM(int enable, int dir, int duty)
-// {
-//     return (enable << 9) | (dir << 8) | (duty & 0xFF);
-// }
+uint32_t Jiwy_setPWM(int enable, int dir, int duty)
+{
+    return (enable << 9) | (dir << 8) | (duty & 0xFF);
+}
 
 uint32_t waitForEncoderEndStop(uint32_t *numberPtr)
 {
@@ -49,7 +49,7 @@ void Jiwy_Init(Jiwy *jiwy,
     PanModelInitialize();
 }
 
-void SetTiltPWM(Jiwy *jiwy)
+void Jiwy_SetTiltPWM(Jiwy *jiwy)
 {
     int dir = 0;
     if (jiwy->tilt_velocity <= 0)
@@ -58,10 +58,10 @@ void SetTiltPWM(Jiwy *jiwy)
     }
     int enable = 1;
     uint32_t duty = (uint32_t)(abs(jiwy->tilt_velocity * 128));
-    *jiwy->pwmTiltPtr = setPWM(enable, dir, duty);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(enable, dir, duty);
 }
 
-void SetPanPWM(Jiwy *jiwy)
+void Jiwy_SetPanPWM(Jiwy *jiwy)
 {
     int dir = 0;
     if (jiwy->pan_velocity <= 0)
@@ -70,23 +70,23 @@ void SetPanPWM(Jiwy *jiwy)
     }
     int enable = 1;
     uint32_t duty = (uint32_t)(abs(jiwy->pan_velocity * 128));
-    *jiwy->pwmPanPtr = setPWM(enable, dir, duty);
+    *jiwy->pwmPanPtr = sJiwy_etPWM(enable, dir, duty);
 }
 
-double getTilt(Jiwy *jiwy)
+double Jiwy_getTilt(Jiwy *jiwy)
 {
     return (*((int32_t *)jiwy->encoderTiltPtr) - jiwy->tiltMin) / ((double)(jiwy->tiltMax - jiwy->tiltMin));
 }
 
-double getPan(Jiwy *jiwy)
+double Jiwy_getPan(Jiwy *jiwy)
 {
     return (*((int32_t *)jiwy->encoderPanPtr) - jiwy->panMin) / ((double)(jiwy->panMax - jiwy->panMin));
 }
 
 // Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
-void CalibratePan(Jiwy *jiwy)
+void Jiwy_CalibratePan(Jiwy *jiwy)
 {
-    *jiwy->pwmPanPtr = setPWM(1, 1, 24);
+    *jiwy->pwmPanPtr = Jiwy_setPWM(1, 1, 24);
     // sweep to min
     jiwy->panMin = waitForEncoderEndStop((uint32_t *)jiwy->encoderPanPtr);
     *jiwy->pwmPanPtr = setPWM(1, 0, 24);
@@ -96,32 +96,40 @@ void CalibratePan(Jiwy *jiwy)
 }
 
 // Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
-void CalibrateTilt(Jiwy *jiwy)
+void Jiwy_CalibrateTilt(Jiwy *jiwy)
 {
     *jiwy->pwmTiltPtr = setPWM(1, 1, 24);
     uint32_t temp, prevTemp;
     prevTemp = 0;
     // sweep to min
     jiwy->tiltMin = waitForEncoderEndStop((int32_t *)jiwy->encoderTiltPtr);
-    *jiwy->pwmTiltPtr = setPWM(1, 0, 24);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 0, 24);
     // sweep to max
     jiwy->tiltMax = waitForEncoderEndStop((int32_t *)jiwy->encoderTiltPtr);
-    *jiwy->pwmTiltPtr = setPWM(0, 0, 0); // break to stop the motor
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 0, 0); // break to stop the motor
 }
 
 void Update(Jiwy *jiwy)
 {
     // set outputs
-    SetTiltPWM(jiwy);
-    SetPanPWM(jiwy);
+    Jiwy_SetTiltPWM(jiwy);
+    Jiwy_SetPanPWM(jiwy);
 
     // measure and set current positions
-    jiwy->tilt_current = getTilt(jiwy);
-    jiwy->pan_current = getPan(jiwy);
+    jiwy->tilt_current = Jiwy_getTilt(jiwy);
+    jiwy->pan_current = Jiwy_getPan(jiwy);
 
-    double tilt_inputs[3]  = {0.0, jiwy->tilt_target, jiwy->tilt_current};
-    double tilt_outputs[3] = {0.0, 0.0, 0.0};
+    XXDouble tilt_inputs[3]  = {0.0, (XXDouble)(jiwy->tilt_target), (XXDouble)(jiwy->tilt_current)};
+    XXDouble tilt_outputs[3] = {0.0, 0.0, 0.0};
+    XXDouble pan_inputs[3] = {0.0, (XXDouble)(jiwy->pan_target), (XXDouble)(jiwy->pan_current)};
+    XXDouble pan_outputs[3] = {0.0, 0.0, 0.0};
 
     // calculate
-    TiltCalculateSubmodel(&tilt_inputs, &tilt_outputs, 0.0);
+    TiltCalculateSubmodel(tilt_inputs, tilt_outputs, (XXDouble)(jiwy->time));
+    PanCalculateSubmodel(pan_inputs, pan_outputs, (XXDouble)(jiwy->time));
+    jiwy->time += jiwy->dt;
+
+    //Save output values for next iteration
+    jiwy->tilt_velocity = tilt_outputs[2];
+    jiwy->pan_velocity = pan_outputs[2];
 }

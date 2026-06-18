@@ -73,12 +73,12 @@ void Jiwy_SetPanPWM(Jiwy *jiwy)
     *jiwy->pwmPanPtr = sJiwy_etPWM(enable, dir, duty);
 }
 
-double Jiwy_getTilt(Jiwy *jiwy)
+double Jiwy_getTilt(Jiwy *jiwy) //convert uint32_t to a callibrated double
 {
     return (*((int32_t *)jiwy->encoderTiltPtr) - jiwy->tiltMin) / ((double)(jiwy->tiltMax - jiwy->tiltMin));
 }
 
-double Jiwy_getPan(Jiwy *jiwy)
+double Jiwy_getPan(Jiwy *jiwy) //convert uint32_t to a callibrated double
 {
     return (*((int32_t *)jiwy->encoderPanPtr) - jiwy->panMin) / ((double)(jiwy->panMax - jiwy->panMin));
 }

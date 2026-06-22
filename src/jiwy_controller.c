@@ -50,8 +50,8 @@ void Jiwy_Init(Jiwy *jiwy,
     jiwy->tiltMin = 0;
     jiwy->tiltMax = 0;
 
-    TiltModelInitialize();
-    PanModelInitialize();
+    TiltInitializeSubmodel();
+    PanInitializeSubmodel();
 }
 
 void Jiwy_SetTiltPWM(Jiwy *jiwy)

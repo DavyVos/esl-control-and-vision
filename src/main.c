@@ -43,6 +43,9 @@ int main(int argc, char **argv)
 	//Jiwy_SetTargetPan(&jiwy, 0.5);
 	//Jiwy_SetTargetTilt(&jiwy, 0.5);
 
+	jiwy.tilt_target = 0.5;
+	jiwy.pan_target = 0.5;
+
 	uint8_t enable = 0;
 	uint8_t dir = 0;
 	uint8_t duty = 90;
@@ -56,7 +59,7 @@ int main(int argc, char **argv)
 		//printf("PWM(Tilt: %u, pan: %u), Encoder(Tilt: %i, Pan: %i)\n", pwmTiltValue, pwmPanValue, tiltValue, panValue);
 		//printf("tilt_min: %i, tilt_max: %i, pan_min: %i, pan_max: %i Tilt: %u, pan: %u), Encoder(Tilt: %i, Pan: %i\n", jiwy.tiltMin, jiwy.tiltMax, jiwy.panMin, jiwy.panMax, pwmTiltValue, pwmPanValue, tiltValue, panValue);
 		printf("calibrated tilt: %f, pan: %f \n", Jiwy_getTilt(&jiwy), Jiwy_getPan(&jiwy));
-		//Jiwy_Update(&jiwy);
+		Jiwy_Update(&jiwy);
 		usleep(100);
 	}
 

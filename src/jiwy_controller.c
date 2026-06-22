@@ -13,6 +13,11 @@ uint32_t Jiwy_setPWM(int enable, int dir, int duty)
     return (enable << 9) | (dir << 8) | (duty & 0xFF);
 }
 
+int16_t sanitizeEncoder(uint32_t raw)
+{
+    return (int16_t)(raw & 0xFFFF);
+}
+
 uint32_t waitForEncoderEndStop(uint32_t *numberPtr)
 {
     uint32_t temp, prevTemp;
@@ -73,14 +78,18 @@ void Jiwy_SetPanPWM(Jiwy *jiwy)
     *jiwy->pwmPanPtr = Jiwy_setPWM(enable, dir, duty);
 }
 
-double Jiwy_getTilt(Jiwy *jiwy) //convert uint32_t to a callibrated double
+double Jiwy_getTilt(Jiwy *jiwy)
 {
-    return (*((int32_t *)jiwy->encoderTiltPtr) - jiwy->tiltMin) / ((double)(jiwy->tiltMax - jiwy->tiltMin));
+    double mid = (jiwy->tiltMax + jiwy->tiltMin) / 2.0;
+    double half = (jiwy->tiltMax - jiwy->tiltMin) / 2.0;
+    return (sanitizeEncoder(*jiwy->encoderTiltPtr) - mid) / (half / 0.99);
 }
 
-double Jiwy_getPan(Jiwy *jiwy) //convert uint32_t to a callibrated double
+double Jiwy_getPan(Jiwy *jiwy)
 {
-    return (*((int32_t *)jiwy->encoderPanPtr) - jiwy->panMin) / ((double)(jiwy->panMax - jiwy->panMin));
+    double mid = (jiwy->panMax + jiwy->panMin) / 2.0;
+    double half = (jiwy->panMax - jiwy->panMin) / 2.0;
+    return (sanitizeEncoder(*jiwy->encoderPanPtr) - mid) / (half / 0.99);
 }
 
 // Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
@@ -88,12 +97,12 @@ void Jiwy_CalibratePan(Jiwy *jiwy)
 {
     *jiwy->pwmPanPtr = Jiwy_setPWM(1, 1, 30);
     usleep(1000000);
-    jiwy->panMax = *jiwy->encoderPanPtr;
+    jiwy->panMax = sanitizeEncoder(*jiwy->encoderPanPtr);
     // sweep to min
     *jiwy->pwmPanPtr = Jiwy_setPWM(1, 0, 30);
     // sweep to max
     usleep(1000000);
-    jiwy->panMax = *jiwy->encoderPanPtr;
+    jiwy->panMax = sanitizeEncoder(*jiwy->encoderPanPtr);
     *jiwy->pwmPanPtr = Jiwy_setPWM(0, 0, 0); // brake to stop the motor
 }
 
@@ -104,11 +113,11 @@ void Jiwy_CalibrateTilt(Jiwy *jiwy)
     *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 1, 30);
     usleep(1000000);
     *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 1, 30);
-    jiwy->tiltMin = *jiwy->encoderTiltPtr;
+    jiwy->tiltMin = sanitizeEncoder(*jiwy->encoderTiltPtr);
     *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 0, 30);
     usleep(1000000);
     *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 1, 30);
-    jiwy->tiltMax = *jiwy->encoderTiltPtr;
+    jiwy->tiltMax = sanitizeEncoder(*jiwy->encoderTiltPtr);
     // sweep to max
     *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 0, 0); // break to stop the motor
 }

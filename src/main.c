@@ -53,8 +53,9 @@ int main(int argc, char **argv)
 		uint32_t pwmTiltValue = *((uint32_t *)pwmTilt);
 		uint32_t panValue     = *((uint32_t *)encoderPan);
 		uint32_t tiltValue    = *((uint32_t *)encoderTilt);
-		printf("PWM(Tilt: %u, pan: %u), Encoder(Tilt: %u, Pan: %u)\n", pwmTiltValue, pwmPanValue, tiltValue, panValue);
-		//Update();
+		//printf("PWM(Tilt: %u, pan: %u), Encoder(Tilt: %u, Pan: %u)\n", pwmTiltValue, pwmPanValue, tiltValue, panValue);
+		printf("tilt_min: %u, tilt_max: %u, pan_min: %u, pan_max: %u Tilt: %u, pan: %u), Encoder(Tilt: %u, Pan: %u\n", jiwy.tiltMin, jiwy.tiltMax, jiwy.panMin, jiwy.panMax, pwmTiltValue, pwmPanValue, tiltValue, panValue);
+		Jiwy_Update(&jiwy);
 		usleep(100);
 	}
 

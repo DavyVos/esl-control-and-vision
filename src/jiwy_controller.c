@@ -16,7 +16,7 @@ uint32_t Jiwy_setPWM(int enable, int dir, int duty)
 uint32_t waitForEncoderEndStop(uint32_t *numberPtr)
 {
     uint32_t temp, prevTemp;
-    prevTemp = 0;
+    prevTemp = *numberPtr;
     while (1)
     {
         temp = *numberPtr;
@@ -70,7 +70,7 @@ void Jiwy_SetPanPWM(Jiwy *jiwy)
     }
     int enable = 1;
     uint32_t duty = (uint32_t)(abs(jiwy->pan_velocity * 128));
-    *jiwy->pwmPanPtr = sJiwy_etPWM(enable, dir, duty);
+    *jiwy->pwmPanPtr = Jiwy_setPWM(enable, dir, duty);
 }
 
 double Jiwy_getTilt(Jiwy *jiwy)
@@ -86,30 +86,34 @@ double Jiwy_getPan(Jiwy *jiwy)
 // Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
 void Jiwy_CalibratePan(Jiwy *jiwy)
 {
-    *jiwy->pwmPanPtr = Jiwy_setPWM(1, 1, 24);
+    *jiwy->pwmPanPtr = Jiwy_setPWM(1, 1, 30);
+    usleep(1000000);
+    jiwy->panMax = *jiwy->encoderPanPtr;
     // sweep to min
-    jiwy->panMin = waitForEncoderEndStop((uint32_t *)jiwy->encoderPanPtr);
-    *jiwy->pwmPanPtr = setPWM(1, 0, 24);
+    *jiwy->pwmPanPtr = Jiwy_setPWM(1, 0, 30);
     // sweep to max
-    jiwy->panMax = waitForEncoderEndStop((uint32_t *)jiwy->encoderPanPtr);
-    *jiwy->pwmPanPtr = setPWM(0, 0, 0); // brake to stop the motor
+    usleep(1000000);
+    jiwy->panMax = *jiwy->encoderPanPtr;
+    *jiwy->pwmPanPtr = Jiwy_setPWM(0, 0, 0); // brake to stop the motor
 }
 
 // Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
 void Jiwy_CalibrateTilt(Jiwy *jiwy)
 {
-    *jiwy->pwmTiltPtr = setPWM(1, 1, 24);
-    uint32_t temp, prevTemp;
-    prevTemp = 0;
     // sweep to min
-    jiwy->tiltMin = waitForEncoderEndStop((int32_t *)jiwy->encoderTiltPtr);
-    *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 0, 24);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 1, 30);
+    usleep(1000000);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 1, 30);
+    jiwy->tiltMin = *jiwy->encoderTiltPtr;
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(1, 0, 30);
+    usleep(1000000);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 1, 30);
+    jiwy->tiltMax = *jiwy->encoderTiltPtr;
     // sweep to max
-    jiwy->tiltMax = waitForEncoderEndStop((int32_t *)jiwy->encoderTiltPtr);
     *jiwy->pwmTiltPtr = Jiwy_setPWM(0, 0, 0); // break to stop the motor
 }
 
-void Update(Jiwy *jiwy)
+void Jiwy_Update(Jiwy *jiwy)
 {
     // set outputs
     Jiwy_SetTiltPWM(jiwy);
@@ -119,7 +123,7 @@ void Update(Jiwy *jiwy)
     jiwy->tilt_current = Jiwy_getTilt(jiwy);
     jiwy->pan_current = Jiwy_getPan(jiwy);
 
-    XXDouble tilt_inputs[3]  = {0.0, (XXDouble)(jiwy->tilt_target), (XXDouble)(jiwy->tilt_current)};
+    XXDouble tilt_inputs[3] = {0.0, (XXDouble)(jiwy->tilt_target), (XXDouble)(jiwy->tilt_current)};
     XXDouble tilt_outputs[3] = {0.0, 0.0, 0.0};
     XXDouble pan_inputs[3] = {0.0, (XXDouble)(jiwy->pan_target), (XXDouble)(jiwy->pan_current)};
     XXDouble pan_outputs[3] = {0.0, 0.0, 0.0};
@@ -129,7 +133,7 @@ void Update(Jiwy *jiwy)
     PanCalculateSubmodel(pan_inputs, pan_outputs, (XXDouble)(jiwy->time));
     jiwy->time += jiwy->dt;
 
-    //Save output values for next iteration
+    // Save output values for next iteration
     jiwy->tilt_velocity = tilt_outputs[2];
     jiwy->pan_velocity = pan_outputs[2];
 }

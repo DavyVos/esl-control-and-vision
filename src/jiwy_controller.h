@@ -6,17 +6,16 @@
 
 typedef struct
 {
-  uint32_t *encoderPanPtr;
-  uint32_t *encoderTiltPtr;
-  uint32_t *pwmPanPtr;
-  uint32_t *pwmTiltPtr;
+  int16_t *encoderPanPtr;
+  int16_t *encoderTiltPtr;
+  int16_t *pwmPanPtr;
+  int16_t *pwmTiltPtr;
 
   // pitch and pan extremes for conversion to double
-  int32_t panMin, panMax;
-  int32_t tiltMin, tiltMax;
+  int16_t panMin, panMax;
+  int16_t tiltMin, tiltMax;
 
   // converted pitch and pan positions to feed into submodels
-  
   double tilt_target, tilt_current;
   double pan_target, pan_current;
 
@@ -37,7 +36,7 @@ void Jiwy_Init(Jiwy *jiwy,
 void Jiwy_CalibratePan(Jiwy *jiwy);
 void Jiwy_CalibrateTilt(Jiwy *jiwy);
 
-void Jiwy_SetTargetPan(Jiwy *jiwy, double target);
+//void Jiwy_SetTargetPan(Jiwy *jiwy, double target);
 void Jiwy_SetTargetTilt(Jiwy *jiwy, double target);
 
 // Set the PWM output according to current Jiwy

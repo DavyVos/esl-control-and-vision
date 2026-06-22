@@ -50,8 +50,13 @@ void Jiwy_Init(Jiwy *jiwy,
     jiwy->tiltMin = 0;
     jiwy->tiltMax = 0;
 
-    TiltInitializeSubmodel();
-    PanInitializeSubmodel();
+    XXDouble tilt_inputs[3] = {0.0, jiwy->tilt_target, jiwy->tilt_current};
+    XXDouble tilt_outputs[1] = {0.0};
+    XXDouble pan_inputs[3] = {0.0, jiwy->pan_target, jiwy->pan_current};
+    XXDouble pan_outputs[1] = {0.0};
+
+    TiltInitializeSubmodel(tilt_inputs, tilt_outputs, jiwy->time);
+    PanInitializeSubmodel(pan_inputs, pan_outputs, jiwy->time);
 }
 
 void Jiwy_SetTiltPWM(Jiwy *jiwy)
@@ -62,7 +67,7 @@ void Jiwy_SetTiltPWM(Jiwy *jiwy)
         dir = 1;
     }
     int enable = 1;
-    uint32_t duty = (uint32_t)(abs(jiwy->tilt_velocity * 128));
+    uint32_t duty = (uint8_t)(abs(jiwy->tilt_velocity * 128));
     *jiwy->pwmTiltPtr = Jiwy_setPWM(enable, dir, duty);
 }
 
@@ -74,7 +79,7 @@ void Jiwy_SetPanPWM(Jiwy *jiwy)
         dir = 1;
     }
     int enable = 1;
-    uint32_t duty = (uint32_t)(abs(jiwy->pan_velocity * 128));
+    uint32_t duty = (uint8_t)(abs(jiwy->pan_velocity * 128));
     *jiwy->pwmPanPtr = Jiwy_setPWM(enable, dir, duty);
 }
 

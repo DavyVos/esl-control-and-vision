@@ -7,7 +7,7 @@
 
 #include "soc_system.h"
 
-int main(int argc, char **argv)
+int main()
 {
 	int fd = 0; // file descriptor
 
@@ -17,15 +17,7 @@ int main(int argc, char **argv)
 		perror("Couldn't open /dev/mem\n");
 		return -1;
 	}
-	uint32_t *base      = NULL;
-	uint32_t *pitch_enc = NULL;
-	uint32_t *yaw_enc   = NULL;
-	if (base == MAP_FAILED)
-	{
-		perror("Couldn't map bridge.");
-		close(fd);
-		return -1;
-	}
+
 	// Avalon maps a contiguous memory area
 	// Pan = Yaw
 	// Pitch = Tilt
@@ -33,6 +25,13 @@ int main(int argc, char **argv)
     uint32_t *encoderPan  = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_ENCODER_BUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_ENCODER_BUS_1_BASE);
     uint32_t *pwmTilt     = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_0_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_0_BASE);
     uint32_t *pwmPan      = (uint32_t *)mmap(NULL, HPS_0_ARM_A9_0_PWMBUS_1_SPAN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, HPS_0_ARM_A9_0_PWMBUS_1_BASE);
+
+	if (encoderTilt == MAP_FAILED)
+	{
+		perror("Couldn't map bridge.");
+		close(fd);
+		return -1;
+	}
 
 	Jiwy jiwy;
 	Jiwy_Init(&jiwy, encoderPan, encoderTilt, pwmPan, pwmTilt);
@@ -46,19 +45,12 @@ int main(int argc, char **argv)
 	jiwy.tilt_target = 0.5;
 	jiwy.pan_target = 0.5;
 
-	uint8_t enable = 0;
-	uint8_t dir = 0;
-	uint8_t duty = 90;
-
 	while (1)
 	{
 		uint32_t pwmPanValue  = *((uint32_t *)pwmPan); 
 		uint32_t pwmTiltValue = *((uint32_t *)pwmTilt);
-		int16_t panValue     = sanitizeEncoder(*((uint32_t *)encoderPan));
-		int16_t tiltValue    = sanitizeEncoder(*((uint32_t *)encoderTilt));
-		//printf("PWM(Tilt: %u, pan: %u), Encoder(Tilt: %i, Pan: %i)\n", pwmTiltValue, pwmPanValue, tiltValue, panValue);
-		//printf("tilt_min: %i, tilt_max: %i, pan_min: %i, pan_max: %i Tilt: %u, pan: %u), Encoder(Tilt: %i, Pan: %i\n", jiwy.tiltMin, jiwy.tiltMax, jiwy.panMin, jiwy.panMax, pwmTiltValue, pwmPanValue, tiltValue, panValue);
-		printf("calibrated tilt: %f, pan: %f \n", Jiwy_getTilt(&jiwy), Jiwy_getPan(&jiwy));
+		printf("tilt_min: %i, tilt_max: %i, pan_min: %i, pan_max: %i Tilt pwm: %u, pan pwm: %u), Encoder(Tilt: %f, Pan: %f\n", 
+			jiwy.tiltMin, jiwy.tiltMax, jiwy.panMin, jiwy.panMax, pwmTiltValue, pwmPanValue, Jiwy_getTilt(&jiwy), Jiwy_getPan(&jiwy));
 		Jiwy_Update(&jiwy);
 		usleep(100);
 	}

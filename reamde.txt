@@ -1,0 +1,4 @@
+
+
+cd /home/davydoescode/Projects/esl-control-and-vision/src && \
+gcc -Wall -Wextra -std=c11 -Icommon -c jiwy_controller.c -o jiwy_controller.o 2>&1

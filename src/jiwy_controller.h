@@ -33,6 +33,7 @@ void Jiwy_Init(Jiwy *jiwy,
                uint32_t *pwmPan,
                uint32_t *pwmTilt);
 
+//calibration motions
 void Jiwy_CalibratePan(Jiwy *jiwy);
 void Jiwy_CalibrateTilt(Jiwy *jiwy);
 
@@ -43,6 +44,7 @@ void Jiwy_SetTargetTilt(Jiwy *jiwy, double target);
 void Jiwy_SetPanPWM(Jiwy *jiwy);
 void Jiwy_SetTiltPWM(Jiwy *jiwy);
 
+// Disable the motors (safety brake)
 void Jiwy_Disable(Jiwy *jiwy);
 void Jiwy_Update(Jiwy *jiwy);
 

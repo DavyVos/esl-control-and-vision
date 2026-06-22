@@ -41,6 +41,7 @@ void Jiwy_Init(Jiwy *jiwy,
 
     XXDouble tilt_inputs[3] = {pan_outputs[0], (XXDouble)(jiwy->tilt_target), (XXDouble)(jiwy->tilt_current)};
     XXDouble tilt_outputs[1] = {0.0};
+    dt = Pan_step_size;
 
     TiltInitializeSubmodel(tilt_inputs, tilt_outputs, jiwy->time);
 }
@@ -83,7 +84,7 @@ double Jiwy_getPan(Jiwy *jiwy)
     return (sanitizeEncoder(*jiwy->encoderPanPtr) - mid) / (half / 0.99);
 }
 
-// Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
+// Sweeps one way set min value, sweeps the other way sets a max
 void Jiwy_CalibratePan(Jiwy *jiwy)
 {
     *jiwy->pwmPanPtr = Jiwy_setPWM(1, 1, 30);
@@ -97,7 +98,7 @@ void Jiwy_CalibratePan(Jiwy *jiwy)
     *jiwy->pwmPanPtr = Jiwy_setPWM(0, 0, 0); // brake to stop the motor
 }
 
-// Sweeps one way set min value, sweeps the other way sets a max TODO: check if not other way around
+// Sweeps one way set min value, sweeps the other way sets a max
 void Jiwy_CalibrateTilt(Jiwy *jiwy)
 {
     // sweep to min

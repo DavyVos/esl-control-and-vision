@@ -49,7 +49,7 @@ int main()
 		printf("tilt_min: %i, tilt_max: %i, pan_min: %i, pan_max: %i Tilt pwm: %u, pan pwm: %u), Encoder(Tilt: %f, Pan: %f\n", 
 			jiwy.tiltMin, jiwy.tiltMax, jiwy.panMin, jiwy.panMax, pwmTiltValue, pwmPanValue, Jiwy_getTilt(&jiwy), Jiwy_getPan(&jiwy));
 		Jiwy_Update(&jiwy);
-		usleep(100);
+		usleep(10000);
 	}
 
 	close(fd);

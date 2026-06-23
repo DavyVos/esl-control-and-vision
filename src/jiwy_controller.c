@@ -54,7 +54,7 @@ void Jiwy_SetTiltPWM(Jiwy *jiwy)
         dir = 1;
     }
     int enable = 1;
-    uint32_t duty = (uint8_t)(fabs(jiwy->tilt_velocity * 255));
+    uint32_t duty = (uint8_t)(fabs(jiwy->tilt_velocity * 64));
     *jiwy->pwmTiltPtr = Jiwy_setPWM(enable, dir, duty);
 }
 

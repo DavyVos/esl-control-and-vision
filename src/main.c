@@ -39,8 +39,8 @@ int main()
 	Jiwy_CalibrateTilt(&jiwy);
 	Jiwy_CalibratePan(&jiwy);
 
-	jiwy.tilt_target = 0.5;
-	jiwy.pan_target  = 0.5;
+	jiwy.tilt_target = 0.0;
+	jiwy.pan_target  = 0.0;
 
 	while (1)
 	{

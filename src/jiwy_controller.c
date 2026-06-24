@@ -141,3 +141,8 @@ void Jiwy_Update(Jiwy *jiwy)
     jiwy->pan_velocity  = pan_outputs[1];
     jiwy->tilt_velocity = tilt_outputs[0];
 }
+
+void Jiwy_Disable(Jiwy *jiwy) {
+    *jiwy->pwmPanPtr = Jiwy_setPWM(0,0,0);
+    *jiwy->pwmTiltPtr = Jiwy_setPWM(0,0,0);
+}

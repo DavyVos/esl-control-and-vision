@@ -12,6 +12,7 @@
 #include <string.h>
 #include <signal.h>
 #include <stdatomic.h>
+#include <stdbool.h>
 
 #define WIDTH 320
 #define HEIGHT 240
